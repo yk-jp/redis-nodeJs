@@ -37,7 +37,7 @@ app.get("/posts/:id", async(req, res) => {
     if (cachedPost) return res.json(JSON.parse(cachedPost));
 
     const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`);
-    client.set(id, JSON.stringify(response.data));
+    client.setex(id, 3600, JSON.stringify(response.data));
 
     return res.json(response.data);
 
