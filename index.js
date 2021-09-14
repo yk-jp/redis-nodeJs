@@ -1,5 +1,6 @@
 const express = require('express');
 const util = require('util');
+const axios = require('axios');
 const app = express();
 
 app.use(express.json());
@@ -26,6 +27,20 @@ app.get('/', async(req, res) => {
     const { key } = req.body;
     const value = await client.get(key);
     res.json(value);
+})
+
+app.get("/posts/:id", async(req, res) => {
+    const id = req.params.id;
+
+    const cachedPost = await client.get(id);
+
+    if (cachedPost) return res.json(JSON.parse(cachedPost));
+
+    const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`);
+    client.set(id, JSON.stringify(response.data));
+
+    return res.json(response.data);
+
 })
 
 app.listen('3000', () => {
